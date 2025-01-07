@@ -1,6 +1,6 @@
 // check .osu documentation to check what fields should be given Option<T>
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct OsuBeatmap {
     version: String,
     general: General,
@@ -12,7 +12,7 @@ pub struct OsuBeatmap {
     hit_objects: Vec<Vec<String>>,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct General {
     audio: String,
     audio_lead_in: i32,
@@ -25,7 +25,7 @@ struct General {
     widescreen_storyboard: bool,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct Editor {
     bookmarks: Vec<i32>,
     distance_spacing: f32,
@@ -34,7 +34,7 @@ struct Editor {
     timeline_zoom: f32,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct Metadata {
     title: String,
     title_unicode: String,
@@ -48,7 +48,7 @@ struct Metadata {
     beatmap_set_id: i32,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct Difficulty {
     hp_drain_rate: f32,
     circle_size: f32,
@@ -58,11 +58,12 @@ struct Difficulty {
     slider_tick_rate: f32,
 }
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct Events {
     bg_src: String,
 }
 
+#[derive(Debug)]
 struct TimingPoint {
     time: i32,
     beat_length: f32,
@@ -107,8 +108,8 @@ impl KeyValue {
         let split: Vec<&str> = line.splitn(2, ':').collect();
 
         KeyValue {
-            key: split[0].to_string(),
-            value: split[1].to_string(),
+            key: split[0].trim().to_string(),
+            value: split[1].trim().to_string(),
         }
     }
 }
@@ -324,11 +325,10 @@ pub fn parse_beatmap(path: &str) -> Result<OsuBeatmap, String> {
             CurrentSection::Events => {
                 let char_vec: Vec<char> = line.chars().collect();
                 match char_vec[0] {
-                    '/' => continue,
                     '0' => {
-                        if beatmap.events.bg_src != "" {
+                        if beatmap.events.bg_src.is_empty() {
                             let split: Vec<&str> = line.split(",").collect();
-                            beatmap.events.bg_src = split[2].replace("\"", "");
+                            beatmap.events.bg_src = split[2].replace('"', "");
                         }
                     }
                     _ => continue,
@@ -357,7 +357,7 @@ pub fn parse_beatmap(path: &str) -> Result<OsuBeatmap, String> {
                 beatmap.timing_points.push(timing_point);
             }
 
-            CurrentSection::Colours => todo!(),
+            CurrentSection::Colours => {}
 
             CurrentSection::HitObjects => {
                 let split: Vec<String> = line.split(",").map(|s| s.to_string()).collect();

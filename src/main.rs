@@ -1,6 +1,15 @@
 use bevy::{prelude::*, window::PrimaryWindow};
+use rosu::osu_parser;
 
 fn main() {
+    let map = osu_parser::parse_beatmap("test-file.osu");
+    match map {
+        Ok(m) => {
+            dbg!(m);
+        }
+        Err(e) => eprintln!("{}", e),
+    }
+
     App::new()
         .add_systems(Startup, setup)
         .add_plugins(TestPlugin)
